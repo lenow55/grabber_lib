@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "grabber-lib"
+version = "0.0.1"
+description = "Возможно это будет библиотека для эффективного скачивания данных с api и их парсинга"
+authors = ["Новиков Илья <nov.ilucha@yandex.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+aiohttp = "^3.9.5"
+orjson = "^3.10.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
