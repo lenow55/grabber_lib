@@ -1,5 +1,6 @@
 import asyncio
 import time
+from typing import AsyncIterator
 
 
 class Limiter:
@@ -9,19 +10,23 @@ class Limiter:
         self.semaphore = asyncio.Semaphore(calls_limit)
         self.requests_finish_time = []
 
+    async def __aenter__(self):
+        await self.acquire()
+        return None
+
+    async def __aexit__(self, exc_type, exc, tb):
+        self.release()
+
     async def sleep(self):
         if len(self.requests_finish_time) >= self.calls_limit:
             sleep_before = self.requests_finish_time.pop(0)
             if sleep_before >= time.monotonic():
                 await asyncio.sleep(sleep_before - time.monotonic())
 
-    def __call__(self, func):
-        async def wrapper(*args, **kwargs):
-            async with self.semaphore:
-                await self.sleep()
-                res = await func(*args, **kwargs)
-                self.requests_finish_time.append(time.monotonic() + self.period)
+    async def acquire(self):
+        await self.semaphore.acquire()
+        await self.sleep()
 
-            return res
-
-        return wrapper
+    def release(self):
+        self.requests_finish_time.append(time.monotonic() + self.period)
+        self.semaphore.release()
