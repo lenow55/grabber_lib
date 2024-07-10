@@ -4,7 +4,7 @@ from time import sleep
 
 
 def worker(queue):
-    sleep(1)
+    sleep(2)
     received_obj = queue.get()  # Получаем объект из очереди
     print("Worker received object with content:", received_obj.getvalue())
 
@@ -22,13 +22,17 @@ if __name__ == "__main__":
 
     # Изменяем исходные данные после помещения в очередь
     # buffer.seek(0)
-    buffer.write(b"New data")
 
     # Запускаем процесс
     process = multiprocessing.Process(target=worker, args=(queue,))
     process.start()
-    process.join()
+    buffer.write(b"New data")
 
     # Проверяем содержимое исходного объекта
     buffer.seek(0)
     print("Main process object content:", buffer.getvalue())
+
+    process.join()
+
+    # В конечном итоге объект полностью копируется в памяти при передаче через очередь.
+    # Тогда не понятно как же эффективнее работать с общими объектами
